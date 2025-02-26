@@ -38,4 +38,21 @@ class Controller:
         self.view.set_button_new_callback(self.btn_add_click)
 
     def btn_add_click(self):
-        print('LISA')
+        word = self.view.get_txt_word.get()
+        category = self.view.get_combo_categories.get()
+
+        if category == 'Vali Kategooria':
+            category = self.view.get_txt_category.get()
+
+        if word and category:
+            self.model.add_word(word, category)
+            self.view.get_txt_word.delete(0, END)
+            self.view.get_txt_category.delete(0, END)
+            self.view.get_combo_categories.current(0)
+            self.view.get_txt_word.focus()
+            self.view.vsb.destroy()
+            self.view.get_my_table.destroy()
+            self.model.data = self.model.read_words()
+            self.view.create_table()
+        else:
+            print('Palun täitke kõik vajalikud väljad.')

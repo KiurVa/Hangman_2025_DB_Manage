@@ -10,7 +10,8 @@ class View(Tk):
         """
         super().__init__() # Pärib kõik originaal Tk omadused: View(Tk)
         self.model = model
-        data = self.model.read_words()
+        self.__myTable = None
+        self.vsb = None
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -33,7 +34,7 @@ class View(Tk):
         # Nupud
         self.__btn_add, self.__btn_edit, self.__btn_delete = self.create_buttons()
 
-        self.create_table(data)
+        self.create_table()
 
     @staticmethod
     def center(win, w, h):
@@ -112,16 +113,17 @@ class View(Tk):
 
         return label, combo
 
-    def create_table(self, data):
+    def create_table(self):
         """
         Loob tabeli mis näitab kirjeid (sõnu ja nende kategooriaid). Loodud ainult tabeli päise osa
         :return: None
         """
+        self.__myTable = None
         self.__myTable = Treeview(self.__frame_bottom)
 
-        vsb = Scrollbar(self.__frame_bottom, orient=VERTICAL, command=self.__myTable.yview)
-        vsb.pack(side=RIGHT, fill=Y)
-        self.__myTable.configure(yscrollcommand=vsb.set)
+        self.vsb = Scrollbar(self.__frame_bottom, orient=VERTICAL, command=self.__myTable.yview)
+        self.vsb.pack(side=RIGHT, fill=Y)
+        self.__myTable.configure(yscrollcommand=self.vsb.set)
 
         self.__myTable['columns'] = ('jrk', 'id', 'word', 'category')
 
@@ -138,14 +140,15 @@ class View(Tk):
         self.__myTable.heading('category', text='Kategooria', anchor=CENTER)
 
         # (START) Siin peaks olema andmete tabelisse lisamise või uuendamise koht
+
         x = 0
-        for word in data:
+        for word in self.model.data:
             self.__myTable.insert(parent='', index='end', iid=str(x), text='',
                                  values=(x+1, word[0], word[1], word[2],))
             x += 1
         # (LÕPP) Siin peaks olema andmete tabelisse lisamise või uuendamise koht
-
         self.__myTable.pack(fill=BOTH, expand=True)
+
 
     def set_button_new_callback(self, callback):
         """Kui vajutatakse lisa nuppu"""

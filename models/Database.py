@@ -64,3 +64,19 @@ class Database:
         except Exception as e:
             print(f"Error reading leaderboard: {e}")
             return []
+
+    def add_word(self, word, category):
+        """Lisab sõna tabelisse words"""
+        try:
+            if not word or not category: #Veendume, et midagi oleks sisestatud
+                raise ValueError('Sisestage nii sõna kui ka kategooria')
+            """Lisame sõna ja kategooria tabelisse"""
+            self.cursor.execute('INSERT INTO words (word, category) VALUES (?, ?)', (word, category))
+            self.conn.commit()
+            print(f'Sõna {word} on lisatud kategooriasse {category}')
+        except sqlite3.Error as e:
+            print(f'Viga sõna lisamisel tabelisse {e}')
+        except ValueError as e:
+            print(f'Viga: {e}')
+
+
