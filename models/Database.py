@@ -3,11 +3,13 @@ import sqlite3
 
 
 class Database:
+    db_name = os.path.join('databases', 'hangman_2025.db') #Andmebaasi asukoht databases/hangman_2025.db
 
     def __init__(self):
         self.conn = None
         self.cursor = None
         self.connect()
+        self.check_tables()
 
     def connect(self):
         """Loob ühenduse andmebaasiga ja kontrollib, kas andmebaas on olemas"""
@@ -27,12 +29,38 @@ class Database:
         """Kontrollib words tabeli olemasolu"""
         self.cursor.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="words";')
         if not self.cursor.fetchone():
-            raise FileNotFoundError('Tabel words puudub. Rakendus ei käivitu.')
-        """Kontrollib, kas words tabelis on sõnu ja kategooriad"""
-        self.cursor.execute('SELECT * FROM words;')
-        if not self.cursor.fetchone():
-            raise ValueError('Tabel words on tühi. Rakendus ei käivitu.')
-        """Kontrollib kas leaderboard tabel on olemas ja vajadusel käivitab selle tegemise"""
-        self.cursor.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="leaderboard";')
-        if not self.cursor.fetchone():
-            self.create_leaderboard_table()
+            self.create_words_table()
+
+    def create_words_table(self):
+        words = """
+                CREATE TABLE words (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    word TEXT NOT NULL,
+                    category TEXT NOT NULL
+                );
+                """
+        self.cursor.execute(words)
+        self.conn.commit()
+        print('Tabel words on loodud.')
+
+    def get_unique_categories(self):
+        """Leiab words tabelist kõik unikaalsed kategooriad ja lisab esimeseks 'Vali Kategooria'"""
+        self.cursor.execute('SELECT DISTINCT category FROM words;')
+        categories = [row[0] for row in self.cursor.fetchall()]
+        categories.sort()
+        categories.insert(0, 'Vali kategooria')
+        return [category.capitalize() for category in categories]
+
+    def read_words(self):
+        """Loeb wordsi tabelist andmed ja tagastab data"""
+        try:
+            self.cursor.execute('SELECT COUNT(*) FROM words;')  # Kontrollib, kas tabelis on mingeid ridu
+            count = self.cursor.fetchone()[0]
+            if count == 0:
+                return []  # Kui ridu ei ole, tagastab tühi loend
+            self.cursor.execute('SELECT * FROM words ORDER BY category, word;')
+            data = self.cursor.fetchall()
+            return data
+        except Exception as e:
+            print(f"Error reading leaderboard: {e}")
+            return []

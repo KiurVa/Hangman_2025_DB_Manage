@@ -10,7 +10,7 @@ class View(Tk):
         """
         super().__init__() # Pärib kõik originaal Tk omadused: View(Tk)
         self.model = model
-        self.__myTable = None
+        data = self.model.read_words()
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -33,7 +33,7 @@ class View(Tk):
         # Nupud
         self.__btn_add, self.__btn_edit, self.__btn_delete = self.create_buttons()
 
-        self.create_table()
+        self.create_table(data)
 
     @staticmethod
     def center(win, w, h):
@@ -87,15 +87,15 @@ class View(Tk):
         Loob kolm nuppu CRUD jaoks. Antud juhul: CUD (Create, Update, Delete)
         :return: btn_1, btn_2, btn_3
         """
-        btn_1 = Button(self.__frame_right, text='Lisa')
+        btn_add = Button(self.__frame_right, text='Lisa')
         btn_2 = Button(self.__frame_right, text='Muuda')
         btn_3 = Button(self.__frame_right, text='Kustuta')
 
-        btn_1.grid(row=0, column=1, padx=1, sticky=EW)
+        btn_add.grid(row=0, column=1, padx=1, sticky=EW)
         btn_2.grid(row=1, column=2, padx=1, sticky=EW)
         btn_3.grid(row=0, column=2, padx=1, sticky=EW)
 
-        return btn_1, btn_2, btn_3
+        return btn_add, btn_2, btn_3
 
     def create_combobox(self):
         """
@@ -106,13 +106,13 @@ class View(Tk):
         label.grid(row=1, column=0, pady=5, sticky=EW)
 
         combo = Combobox(self.__frame_top)
-        combo['values'] = ('Vali kategooria', 'Hooned', 'Loomad', 'Sõidukid') # Näidis
+        combo['values'] = self.model.categories # Näidis
         combo.current(0)
         combo.grid(row=1, column=1, padx=4, sticky=EW)
 
         return label, combo
 
-    def create_table(self):
+    def create_table(self, data):
         """
         Loob tabeli mis näitab kirjeid (sõnu ja nende kategooriaid). Loodud ainult tabeli päise osa
         :return: None
@@ -138,10 +138,18 @@ class View(Tk):
         self.__myTable.heading('category', text='Kategooria', anchor=CENTER)
 
         # (START) Siin peaks olema andmete tabelisse lisamise või uuendamise koht
-
+        x = 0
+        for word in data:
+            self.__myTable.insert(parent='', index='end', iid=str(x), text='',
+                                 values=(x+1, word[0], word[1], word[2],))
+            x += 1
         # (LÕPP) Siin peaks olema andmete tabelisse lisamise või uuendamise koht
 
         self.__myTable.pack(fill=BOTH, expand=True)
+
+    def set_button_new_callback(self, callback):
+        """Kui vajutatakse lisa nuppu"""
+        self.__btn_add.config(command=callback)
 
     # GETTERS
 

@@ -14,6 +14,9 @@ class Controller:
         # Rippmenüü funktsionaalsus
         self.view.get_combo_categories.bind("<<ComboboxSelected>>", self.combobox_change)
 
+        #Nuppude callback seaded
+        self.btn_add_callback()
+
     def combobox_change(self, event=None):
         """
         Kui valitakse rippmenüüst tegevus, saadakse kätte tekst kui ka index (print lause). Näide kuidas võiks
@@ -30,3 +33,9 @@ class Controller:
         else:
             self.view.get_txt_category.config(state='normal')  # Saab sisestada uue kategooria
             self.view.get_txt_category.focus()
+
+    def btn_add_callback(self):
+        self.view.set_button_new_callback(self.btn_add_click)
+
+    def btn_add_click(self):
+        print('LISA')
