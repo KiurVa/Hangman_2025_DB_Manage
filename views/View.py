@@ -11,6 +11,8 @@ class View(Tk):
         super().__init__() # Pärib kõik originaal Tk omadused: View(Tk)
         self.model = model
         self.__myTable = None
+        self.vsb = None
+        self.word_id = None
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -87,15 +89,15 @@ class View(Tk):
         Loob kolm nuppu CRUD jaoks. Antud juhul: CUD (Create, Update, Delete)
         :return: btn_1, btn_2, btn_3
         """
-        btn_1 = Button(self.__frame_right, text='Lisa')
-        btn_2 = Button(self.__frame_right, text='Muuda')
-        btn_3 = Button(self.__frame_right, text='Kustuta')
+        btn_add = Button(self.__frame_right, text='Lisa')
+        btn_edit = Button(self.__frame_right, text='Muuda')
+        btn_delete = Button(self.__frame_right, text='Kustuta')
 
-        btn_1.grid(row=0, column=1, padx=1, sticky=EW)
-        btn_2.grid(row=1, column=2, padx=1, sticky=EW)
-        btn_3.grid(row=0, column=2, padx=1, sticky=EW)
+        btn_add.grid(row=0, column=1, padx=1, sticky=EW)
+        btn_edit.grid(row=1, column=2, padx=1, sticky=EW)
+        btn_delete.grid(row=0, column=2, padx=1, sticky=EW)
 
-        return btn_1, btn_2, btn_3
+        return btn_add, btn_edit, btn_delete
 
     def create_combobox(self):
         """
@@ -106,7 +108,7 @@ class View(Tk):
         label.grid(row=1, column=0, pady=5, sticky=EW)
 
         combo = Combobox(self.__frame_top)
-        combo['values'] = ('Vali kategooria', 'Hooned', 'Loomad', 'Sõidukid') # Näidis
+        combo['values'] = self.model.categories # Näidis
         combo.current(0)
         combo.grid(row=1, column=1, padx=4, sticky=EW)
 
@@ -117,11 +119,12 @@ class View(Tk):
         Loob tabeli mis näitab kirjeid (sõnu ja nende kategooriaid). Loodud ainult tabeli päise osa
         :return: None
         """
+        self.__myTable = None
         self.__myTable = Treeview(self.__frame_bottom)
 
-        vsb = Scrollbar(self.__frame_bottom, orient=VERTICAL, command=self.__myTable.yview)
-        vsb.pack(side=RIGHT, fill=Y)
-        self.__myTable.configure(yscrollcommand=vsb.set)
+        self.vsb = Scrollbar(self.__frame_bottom, orient=VERTICAL, command=self.__myTable.yview)
+        self.vsb.pack(side=RIGHT, fill=Y)
+        self.__myTable.configure(yscrollcommand=self.vsb.set)
 
         self.__myTable['columns'] = ('jrk', 'id', 'word', 'category')
 
@@ -139,9 +142,48 @@ class View(Tk):
 
         # (START) Siin peaks olema andmete tabelisse lisamise või uuendamise koht
 
+        x = 0
+        for word in self.model.data:
+            self.__myTable.insert(parent='', index='end', iid=str(x), text='',
+                                 values=(x+1, word[0], word[1], word[2],))
+            x += 1
         # (LÕPP) Siin peaks olema andmete tabelisse lisamise või uuendamise koht
-
         self.__myTable.pack(fill=BOTH, expand=True)
+
+        self.__myTable.bind('<Double-1>', self.on_row_double_click) #Topelt kliki sündmus
+
+
+    def set_button_new_callback(self, callback):
+        """Kui vajutatakse lisa nuppu"""
+        self.__btn_add.config(command=callback)
+
+    def set_button_edit_callback(self, callback):
+        """Kui vajutatakse muuda nuppu"""
+        self.__btn_edit.config(command=callback)
+
+    def set_button_delete_callback(self, callback):
+        """Kui vajutatakse kustuta nuppu"""
+        self.__btn_delete.config(command=callback)
+
+    def on_row_double_click(self, event):
+        """Topeltkliki väärtuste saamine ja panemine lahtritesse"""
+        selected_item = self.__myTable.selection()
+        if selected_item:
+            row_values = self.__myTable.item(selected_item, 'values')
+            word = row_values[2]
+            category = row_values[3]
+            self.model.word_id = row_values[1]
+
+            self.__txt_word.delete(0, END)
+            self.__txt_word.insert(0, word)
+            self.__combo_categories.set(category) #Vali kategooria asemele ilmub valitud kategooria
+            self.__txt_category['state'] = DISABLED #Muudab kategooria mitteaktiivseks
+            #self.get_txt_category.delete(0, END)
+            #self.get_txt_category.insert(0, category)
+            print(self.model.word_id)
+
+
+
 
     # GETTERS
 
