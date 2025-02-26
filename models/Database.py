@@ -79,4 +79,20 @@ class Database:
         except ValueError as e:
             print(f'Viga: {e}')
 
+    def edit_word_category(self, word, category, item_id):
+        """Sõna või kategooria muutmine"""
+        try:
+            self.cursor.execute('UPDATE words SET word=?, category=? WHERE id=?', (word, category, item_id))
+            self.conn.commit()
+            print(f'Sõna {word} on muudetud kategoorias {category}.')
+        except sqlite3.Error as e:
+            print(f'Viga kirje muutmisel: {e}.')
 
+    def delete_word(self,word, category, item_id):
+        """valitud sõna kustutamine andmebaasist"""
+        try:
+            self.cursor.execute('DELETE FROM words WHERE id=?', (item_id,))
+            self.conn.commit()
+            print(f'Sõna {word} on kustutatud kategooriast {category}.')
+        except sqlite3.Error as e:
+            print(f'Viga kirje kustutamisel: {e}.')

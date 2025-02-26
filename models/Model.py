@@ -3,6 +3,7 @@ class Model:
         self.__database = db
         self.__categories = self.__database.get_unique_categories()
         self.__data = self.__database.read_words()
+        self.word_id = None
 
     def read_words(self):
         """kasutab Database read_words ja saaks seda välja kutsuda View.py"""
@@ -10,6 +11,12 @@ class Model:
 
     def add_word(self, word, category):
         self.__database.add_word(word, category)
+
+    def edit_word_category(self, word, category, item_id):
+        self.__database.edit_word_category(word, category, item_id)
+
+    def delete_word(self,word, category,  item_id):
+        self.__database.delete_word(word, category, item_id)
 
     #GETTERS
     @property

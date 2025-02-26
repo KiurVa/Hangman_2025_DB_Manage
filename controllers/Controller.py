@@ -16,6 +16,8 @@ class Controller:
 
         #Nuppude callback seaded
         self.btn_add_callback()
+        self.btn_edit_callback()
+        self.btn_delete_callback()
 
     def combobox_change(self, event=None):
         """
@@ -24,10 +26,10 @@ class Controller:
         :param event: vaikimisi pole
         :return: None
         """
-        # print(self.view.get_combo_categories.get(), end=" => ") # Tekst rippmenüüst => Hoonaed
-        # print(self.view.get_combo_categories.current()) # Rippmenüü index => 1
+        #print(self.view.get_combo_categories.get(), end=" => ") # Tekst rippmenüüst => Hoonaed
+        #print(self.view.get_combo_categories.current()) # Rippmenüü index => 1
         if self.view.get_combo_categories.current() > 0:  # Vali kategooria on 0
-            self.view.get_txt_category.delete(0, END) # Tühjenda uue kategooria sisestuskast
+            self.view.get_txt_category.delete(0, END)  # Tühjenda uue kategooria sisestuskast
             self.view.get_txt_category.config(state='disabled')  # Ei saa sisestada uut kategooriat
             self.view.get_txt_word.focus()
         else:
@@ -37,22 +39,62 @@ class Controller:
     def btn_add_callback(self):
         self.view.set_button_new_callback(self.btn_add_click)
 
-    def btn_add_click(self):
-        word = self.view.get_txt_word.get()
-        category = self.view.get_combo_categories.get()
+    def btn_edit_callback(self):
+        self.view.set_button_edit_callback(self.btn_edit_click)
 
-        if category == 'Vali Kategooria':
-            category = self.view.get_txt_category.get()
+    def btn_delete_callback(self):
+        self.view.set_button_delete_callback(self.btn_delete_click)
+
+    def btn_add_click(self):
+        """lisa nuppu toimime"""
+        word = self.view.get_txt_word.get().lower()
+        category = self.view.get_combo_categories.get().lower() #Võtab kategooria rippmenüüst
+
+        if self.view.get_combo_categories.current() == 0: #Kategooria on vali kategooria, siis loeb teksti lahtrist
+            category = self.view.get_txt_category.get().lower()
 
         if word and category:
-            self.model.add_word(word, category)
+            self.model.add_word(word, category) #Lisab uue sõna andmebaasi
             self.view.get_txt_word.delete(0, END)
             self.view.get_txt_category.delete(0, END)
             self.view.get_combo_categories.current(0)
-            self.view.get_txt_word.focus()
-            self.view.vsb.destroy()
-            self.view.get_my_table.destroy()
-            self.model.data = self.model.read_words()
-            self.view.create_table()
+            self.view.get_txt_word.focus() #Teeb kastid tühjaks jne
+            self.view.vsb.destroy() #Hävitab kerimise
+            self.view.get_my_table.destroy() #Hävitab my table
+            self.model.data = self.model.read_words() #Võtab uue data uuendatud.
+            self.view.create_table() #Teeb tabeli uuesti
         else:
             print('Palun täitke kõik vajalikud väljad.')
+
+    def btn_edit_click(self):
+        """Muuda nupu toimime"""
+        word = self.view.get_txt_word.get().lower()
+        category = self.view.get_combo_categories.get().lower()
+        item_id = self.model.word_id
+
+        if word and category:
+            self.model.edit_word_category(word, category, item_id)
+            self.view.get_txt_word.delete(0, END)
+            self.view.get_txt_category.delete(0, END)
+            self.view.get_combo_categories.current(0)
+            self.view.get_txt_word.focus()  # Teeb kastid tühjaks jne
+            self.view.vsb.destroy()  # Hävitab kerimise
+            self.view.get_my_table.destroy()  # Hävitab my table
+            self.model.data = self.model.read_words()  # Võtab uue data uuendatud.
+            self.view.create_table()  # Teeb tabeli uuesti
+        else:
+            print('Palun täitke kõik vajalikud väljad.')
+
+    def btn_delete_click(self):
+        word = self.view.get_txt_word.get()
+        category = self.view.get_combo_categories.get()
+        item_id = self.model.word_id
+        self.model.delete_word(word, category, item_id)
+        self.view.get_txt_word.delete(0, END)
+        self.view.get_txt_category.delete(0, END)
+        self.view.get_combo_categories.current(0)
+        self.view.get_txt_word.focus()  # Teeb kastid tühjaks jne
+        self.view.vsb.destroy()  # Hävitab kerimise
+        self.view.get_my_table.destroy()  # Hävitab my table
+        self.model.data = self.model.read_words()  # Võtab uue data uuendatud.
+        self.view.create_table()  # Teeb tabeli uuesti
