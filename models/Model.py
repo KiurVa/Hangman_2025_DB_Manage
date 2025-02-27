@@ -21,6 +21,10 @@ class Model:
     def delete_word(self,word, category,  item_id):
         self.__database.delete_word(word, category, item_id)
 
+    def refresh_categories(self):
+        """Comboboxi uuendamiseks uued kategooriad"""
+        self.__categories = self.__database.get_unique_categories()
+
     #GETTERS
     @property
     def categories(self): #tagastab kategooriate listi

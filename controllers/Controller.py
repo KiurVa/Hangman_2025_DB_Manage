@@ -59,6 +59,8 @@ class Controller:
             self.view.get_txt_category.delete(0, END)
             self.view.get_combo_categories.current(0)
             self.view.get_txt_word.focus() #Teeb kastid tühjaks jne
+            self.model.refresh_categories() #Uued kategooriad
+            self.view.update_combobox() #Uuendab comboboxi
             self.view.vsb.destroy() #Hävitab kerimise
             self.view.get_my_table.destroy() #Hävitab my table
             self.model.data = self.model.read_words() #Võtab uue data uuendatud.
@@ -81,6 +83,8 @@ class Controller:
             self.view.get_txt_category.delete(0, END)
             self.view.get_combo_categories.current(0)
             self.view.get_txt_word.focus()  # Teeb kastid tühjaks jne
+            self.model.refresh_categories() #Uued kategooriad
+            self.view.update_combobox() #Uuendab comboboxi
             self.view.vsb.destroy()  # Hävitab kerimise
             self.view.get_my_table.destroy()  # Hävitab my table
             self.model.data = self.model.read_words()  # Võtab uue data uuendatud.
@@ -102,9 +106,12 @@ class Controller:
             self.view.get_txt_category.delete(0, END)
             self.view.get_combo_categories.current(0)
             self.view.get_txt_word.focus()  # Teeb kastid tühjaks jne
+            self.model.refresh_categories() #Uued kategooriad
+            self.view.update_combobox() #Uuendab comboboxi
             self.view.vsb.destroy()  # Hävitab kerimise
             self.view.get_my_table.destroy()  # Hävitab my table
             self.model.data = self.model.read_words()  # Võtab uue data uuendatud.
             self.view.create_table()  # Teeb tabeli uuesti
+
         else:
             print('Palun täitke kõik vajalikud väljad.')

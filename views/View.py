@@ -13,6 +13,7 @@ class View(Tk):
         self.__myTable = None
         self.vsb = None
         self.word_id = None
+        self.combo = None
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -107,12 +108,12 @@ class View(Tk):
         label = Label(self.__frame_top, text='Vana kategooria', background='lightblue', font=('Verdana', 10, 'bold'))
         label.grid(row=1, column=0, pady=5, sticky=EW)
 
-        combo = Combobox(self.__frame_top)
-        combo['values'] = self.model.categories # Näidis
-        combo.current(0)
-        combo.grid(row=1, column=1, padx=4, sticky=EW)
+        self.combo = Combobox(self.__frame_top)
+        self.combo['values'] = self.model.categories # Näidis
+        self.combo.current(0)
+        self.combo.grid(row=1, column=1, padx=4, sticky=EW)
 
-        return label, combo
+        return label, self.combo
 
     def create_table(self):
         """
@@ -181,6 +182,12 @@ class View(Tk):
             #self.get_txt_category.delete(0, END)
             #self.get_txt_category.insert(0, category)
             print(self.model.word_id)
+
+    def update_combobox(self):
+        """Värskendab rippmenüü sisu vastavalt"""
+        self.__combo_categories['values'] = self.model.categories
+        self.__combo_categories.current(0)
+
 
 
 
