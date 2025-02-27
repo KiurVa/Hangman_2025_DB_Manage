@@ -1,6 +1,9 @@
+from models.Database import Database
+
+
 class Model:
-    def __init__(self, db):
-        self.__database = db
+    def __init__(self):
+        self.__database = Database()
         self.__categories = self.__database.get_unique_categories()
         self.__data = self.__database.read_words()
         self.word_id = None
