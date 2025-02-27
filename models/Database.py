@@ -43,6 +43,16 @@ class Database:
         self.cursor.execute('SELECT name FROM sqlite_master WHERE type="table" AND name="words";')
         if not self.cursor.fetchone():
             self.create_words_table()
+        else:
+            self.cursor.execute('PRAGMA table_info(words);')
+            columns = {row[1] for row in self.cursor.fetchall()}
+            required_columns = {'id', 'word', 'category'}
+
+            if columns != required_columns:
+                print("Tabel words struktuur ei ole korrektne. Teen uue tabeli words ja vana nimetan ümber words_old.")
+                self.cursor.execute('ALTER TABLE words RENAME TO words_old;')
+                self.create_words_table()
+                self.conn.commit()
 
     def create_words_table(self):
         words = """
